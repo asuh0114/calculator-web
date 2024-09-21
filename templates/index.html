@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계산기</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7fc;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .calculator {
+            width: 350px;
+            padding: 20px;
+            border-radius: 20px;
+            background-color: #fff;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .calculator:hover {
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .display {
+            width: 100%;
+            height: 80px;
+            margin-bottom: 20px;
+            text-align: right;
+            padding: 15px;
+            font-size: 38px;
+            border: none;
+            border-radius: 20px;
+            background-color: #f0f4fb;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #333;
+            font-weight: 600;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .display:hover {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .button {
+            width: 100%;
+            height: 65px;
+            font-size: 22px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background-color: #d7e0f0;
+            color: #333;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover {
+            background-color: #bfcde9;
+            transform: translateY(-4px);
+        }
+
+        .button:active {
+            background-color: #a0b9d7;
+            transform: translateY(0);
+        }
+
+        .button.operator {
+            background-color: #ffbe76;
+            color: white;
+        }
+
+        .button.operator:hover {
+            background-color: #ff9f43;
+        }
+
+        .button.operator:active {
+            background-color: #ff793f;
+        }
+
+        .button.clear {
+            background-color: #ff6b81;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .button.clear:hover {
+            background-color: #ff4757;
+        }
+
+        .button.clear:active {
+            background-color: #e84118;
+        }
+
+        .button.special {
+            background-color: #636e72;
+            color: white;
+        }
+
+        .button.special:hover {
+            background-color: #2d3436;
+        }
+
+        .button.special:active {
+            background-color: #1e272e;
+        }
+
+        .calculator {
+            animation: popIn 1s ease-out;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="display" id="display" disabled value="0">
+        <div class="buttons">
+            <button class="button clear" aria-label="Clear" onclick="clearDisplay()">C</button>
+            <button class="button operator" aria-label="Divide" onclick="setOperator('/')">/</button>
+            <button class="button operator" aria-label="Multiply" onclick="setOperator('*')">*</button>
+            <button class="button" aria-label="7" onclick="appendNumber('7')">7</button>
+            <button class="button" aria-label="8" onclick="appendNumber('8')">8</button>
+            <button class="button" aria-label="9" onclick="appendNumber('9')">9</button>
+            <button class="button operator" aria-label="Subtract" onclick="setOperator('-')">-</button>
+            <button class="button" aria-label="4" onclick="appendNumber('4')">4</button>
+            <button class="button" aria-label="5" onclick="appendNumber('5')">5</button>
+            <button class="button" aria-label="6" onclick="appendNumber('6')">6</button>
+            <button class="button operator" aria-label="Add" onclick="setOperator('+')">+</button>
+            <button class="button" aria-label="1" onclick="appendNumber('1')">1</button>
+            <button class="button" aria-label="2" onclick="appendNumber('2')">2</button>
+            <button class="button" aria-label="3" onclick="appendNumber('3')">3</button>
+            <button class="button operator" aria-label="Calculate" onclick="calculate()">=</button>
+            <button class="button" aria-label="0" onclick="appendNumber('0')">0</button>
+            <button class="button special" aria-label="Decimal" onclick="appendDot()">.</button>
+            <button class="button special" aria-label="Toggle Sign" onclick="toggleSign()">+/-</button>
+        </div>
+    </div>
+
+    <script>
+        let currentExpression = '';
+        let operator = null;
+        let shouldResetDisplay = false;
+        const display = document.getElementById('display');
+
+        function clearDisplay() {
+            currentExpression = '';
+            operator = null;
+            display.value = '0';
+            shouldResetDisplay = false;
+        }
+
+        function appendNumber(number) {
+            if (shouldResetDisplay) {
+                currentExpression = '';
+                shouldResetDisplay = false;
+            }
+            currentExpression += number;
+            updateDisplay();
+        }
+
+        function appendDot() {
+            if (shouldResetDisplay) {
+                currentExpression = '0.';
+                shouldResetDisplay = false;
+            } else if (!currentExpression.includes('.')) {
+                currentExpression += '.';
+            }
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            display.value = currentExpression || '0';
+        }
+
+        function setOperator(op) {
+            if (currentExpression === '' || currentExpression.endsWith(' ')) return;
+            currentExpression += ' ' + op + ' ';
+            updateDisplay();
+        }
+
+        function calculate() {
+            try {
+                const result = eval(currentExpression);
+                display.value = result;
+                currentExpression = result.toString();
+                shouldResetDisplay = true;
+            } catch {
+                display.value = 'Error';
+                currentExpression = '';
+            }
+        }
+
+        function toggleSign() {
+            if (currentExpression === '') return;
+            if (currentExpression.startsWith('-')) {
+                currentExpression = currentExpression.slice(1);
+            } else {
+                currentExpression = '-' + currentExpression;
+            }
+            updateDisplay();
+        }
+    </script>    
+</body>
+</html>
